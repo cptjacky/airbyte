@@ -31,12 +31,16 @@ import airbyte_cdk.sources.utils.casing as casing
 from airbyte_cdk.logger import AirbyteLogger
 from airbyte_cdk.models import AirbyteStream, SyncMode
 from airbyte_cdk.sources.utils.schema_helpers import ResourceSchemaLoader
+from airbyte_cdk.sources.utils.transform import TransformConfig, Transformer
 
 
 def package_name_from_class(cls: object) -> str:
     """Find the package name given a class name"""
     module: Any = inspect.getmodule(cls)
     return module.__name__.split(".")[0]
+
+
+_default_transformer = Transformer(TransformConfig.NoTransform)
 
 
 class Stream(ABC):
@@ -46,6 +50,9 @@ class Stream(ABC):
 
     # Use self.logger in subclasses to log any messages
     logger = AirbyteLogger()  # TODO use native "logging" loggers with custom handlers
+
+    # Transformer object ot perform output data transformation
+    transformer: Transformer = _default_transformer
 
     @property
     def name(self) -> str:
